@@ -56,7 +56,7 @@
 		<input type="password" id="password" placeholder="Password"> <input
 			type="button" onclick="onSubmit()" value="Authenicate" />
 	</form>
-	<strong>Authentication Error Response</strong>:
+	<strong>Error Response</strong>:
 	<div id="ErrorReponse"></div>
 </body>
 </html>
