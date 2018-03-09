@@ -54,7 +54,7 @@ public class AuthenticationRequestHandler extends RequestHandlerBase {
 				if (firstHeader.getValue().equals("true")) {
 					Header authGrant = response.getFirstHeader(AEHClientConstants.AUTH_GRANT_HEADER);
 					if (null == authGrant || "".equals(authGrant.getValue())) {
-						sendErrorResponse(param, "Auth Grant not received from the server hence sending an error code");
+						sendErrorResponse(param, "Server didnt respond");
 					} else {
 						HttpServletResponse httpServletResponse = param.getResponse();
 						httpServletResponse.setHeader(AEHClientConstants.AUTH_GRANT_HEADER, authGrant.getValue());
