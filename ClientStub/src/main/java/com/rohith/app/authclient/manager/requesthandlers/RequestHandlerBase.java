@@ -67,24 +67,15 @@ public abstract class RequestHandlerBase {
 	}
 
 	protected CloseableHttpResponse sendGetRequest(HttpGet getRequest) throws ClientProtocolException, IOException {
-
 		ConnectionManager connectionManager = getManager().getConnectionManager();
-		
 		HttpClientContext clientContext = connectionManager.getClientContext();
-		
 		return connectionManager.executeGetRequest(getRequest, clientContext);
 	}
-	
 	protected CloseableHttpResponse sendPostRequest(HttpPost getRequest) throws ClientProtocolException, IOException {
-		
 		ConnectionManager connectionManager = getManager().getConnectionManager();
-		
 		HttpClientContext clientContext = connectionManager.getClientContext();
-		
 		return connectionManager.executePostRequest(getRequest, clientContext);
 	}
-
-	
 	protected void sendErrorResponse(AEHClientParam param, String errorMessage) throws IOException{
 		System.out.println(errorMessage);
 		HttpServletResponse res = param.getResponse();

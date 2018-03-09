@@ -58,7 +58,6 @@ public class AuthenticationRequestHandler extends RequestHandlerBase {
 					} else {
 						HttpServletResponse httpServletResponse = param.getResponse();
 						httpServletResponse.setHeader(AEHClientConstants.AUTH_GRANT_HEADER, authGrant.getValue());
-						System.out.println(authGrant);
 						param.setRequestType(RequestType.AUTHERIZE);
 						next.handleRequest(param);
 					}

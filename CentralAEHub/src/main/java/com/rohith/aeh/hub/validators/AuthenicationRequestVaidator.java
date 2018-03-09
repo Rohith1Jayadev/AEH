@@ -14,7 +14,6 @@ public class AuthenicationRequestVaidator extends ParamValidator {
 			return false;
 		
 		}
-		
 		return true;
 	}
 

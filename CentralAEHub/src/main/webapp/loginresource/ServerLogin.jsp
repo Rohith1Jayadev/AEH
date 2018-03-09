@@ -39,6 +39,10 @@
 							
 							
 			},
+			error: function(data){
+					console.log(data);
+					$('#ErrorReponse').html(data.responseText);
+			},
 
 		});
 
@@ -52,5 +56,7 @@
 		<input type="password" id="password" placeholder="Password"> <input
 			type="button" onclick="onSubmit()" value="Authenicate" />
 	</form>
+	<strong>Error Response</strong>:
+	<div id="ErrorReponse"></div>
 </body>
 </html>
