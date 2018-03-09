@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+	type="text/javascript"></script>
+<title>Authenticate Using Email and Password</title>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		console.log("Authenicate");
+
+	});
+
+	function onSubmit() {
+
+		var email = $('#email').val();
+		var passwd = $('#password').val();
+
+		var xhr = $.ajax({
+
+			type : "POST",
+			url : '${pageContext.request.parameter.}/myServlet',
+			data : {
+				email : email,
+				password : passwd
+			},
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('X-Request-Type', 'AUTHENTICATE');
+			},
+
+			success : function(data) {
+				console.log(data);
+			},
+
+		});
+
+	};
+</script>
+</head>
+<body>
+	<form name="Authenticateform">
+		<input type="text" id="email" placeholder="Email ID" />
+		<p />
+		<input type="password" id="password" placeholder="Password"> <input
+			type="button" onclick="onSubmit()" value="Authenicate" />
+	</form>
+</body>
+</html>

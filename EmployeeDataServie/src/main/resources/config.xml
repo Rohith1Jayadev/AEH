@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<aehMasterConfig>
+    <clientSecret>AUCLIENT789</clientSecret>
+    <masterHost>localhost</masterHost>
+    <masterPort>8080</masterPort>
+    <masterUrl>/CentralAEHub/access</masterUrl>
+    <masterRegisterUrl>/CentralAEHub/register</masterRegisterUrl>
+    <masterAuthenticationUrl>/CentralAEHub/authenticate</masterAuthenticationUrl>
+    <masterAutherizatonUrl>/CentralAEHub/autherize</masterAutherizatonUrl>
+    <maxConnectionPerRoute>10</maxConnectionPerRoute>
+    <maxTotalConnection>50</maxTotalConnection>
+    <encryptionConfig>
+    <encryptionAlgorthim>AES</encryptionAlgorthim>
+    <transformationMode>CBC</transformationMode>
+    <paddingScheme>PKCS5Padding</paddingScheme>
+    </encryptionConfig>
+</aehMasterConfig>
