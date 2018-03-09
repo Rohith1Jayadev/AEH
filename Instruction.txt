@@ -1,0 +1,21 @@
+The File gives you are brief overview of the AEH sample in this repository.
+
+There are three projects the master hub, the client stub and a sample service 
+
+The Dummy Service has the client stub as a dependency jar.
+
+The Central Stub is acts as the dummy version of the AEH central server.
+
+To start with run both the server and the service in tomcat.
+
+Try accessing in the page -> localhost:8080/EmployeeDataServie/Login.jsp
+
+It will guide you to a page where you have a text box to enter your name and an access button
+
+once you click the access button it tries to access the service private resource
+
+But Since the user is authenticated it redirects to a login Page -> The Login Page where the user email and password needs to be entered.
+
+Once it is authenticated and authorized it will load back to init page where the user is asked to click the access button again
+
+This time he will be authorized to the resource and after wards the resource page will be loaded
