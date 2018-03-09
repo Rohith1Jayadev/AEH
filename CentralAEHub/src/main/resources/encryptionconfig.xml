@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hubEncryptionConfig>
+<encryptionAlgorthim>AES</encryptionAlgorthim>
+<transformationMode>CBC</transformationMode>
+<paddingScheme>PKCS5Padding</paddingScheme>
+<keySize>256</keySize>
+</hubEncryptionConfig>
