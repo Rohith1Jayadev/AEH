@@ -18,6 +18,7 @@ import com.rohith.app.authclient.config.AEHMasterConfig;
 import com.rohith.app.authclient.constants.AEHClientConstants;
 import com.rohith.app.authclient.exception.AEHClientException;
 import com.rohith.app.authclient.manager.AEHClientManager;
+import com.rohith.app.authclient.util.AEHClientDateUtil;
 
 public class AcessRequestHandler extends RequestHandlerBase {
 
@@ -44,16 +45,7 @@ public class AcessRequestHandler extends RequestHandlerBase {
 			HttpGet getRequest = createRequest(param);
 			response = sendGetRequest(getRequest);
 			Header firstHeader = response.getFirstHeader(AEHClientConstants.SERVER_ACCESS_AUTH_RESPONSE);
-			if (null != firstHeader && firstHeader.getValue().equals("true")) {
-				String bearerToken = getBearerToken(param.getRequest());
-				if (null == bearerToken) {
-					bearerToken = getRequest.getFirstHeader(AEHClientConstants.BEARER_TOKEN).getValue();
-				}
-				param.getResponse().addCookie(new Cookie(AEHClientConstants.BEARER_TOKEN, bearerToken));
-				param.getChain().doFilter(param.getRequest(), param.getResponse());
-			} else {
-				createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
-			}
+			takeDecision(param, response, getRequest, firstHeader);
 		} catch (ClientProtocolException e) {
 			throw new AEHClientException("A client protocol exception occured while communicating with host", e);
 		} catch (IOException e) {
@@ -69,6 +61,26 @@ public class AcessRequestHandler extends RequestHandlerBase {
 				throw new AEHClientException("An IO Exception  occured while closing the response from server", e);
 			}
 		}
+	}
+
+	private void takeDecision(AEHClientParam param, CloseableHttpResponse response, HttpGet getRequest,
+			Header firstHeader) throws IOException, ServletException, AEHClientException {
+			if (null != firstHeader && firstHeader.getValue().equals("true")) {
+			String bearerToken = getBearerToken(param.getRequest());
+			if (null == bearerToken || "".equals(bearerToken) || "null".equals(bearerToken)) {
+				bearerToken = getRequest.getFirstHeader(AEHClientConstants.BEARER_TOKEN).getValue();
+			}
+			param.getResponse().addCookie(addCookie(bearerToken));
+			param.getChain().doFilter(param.getRequest(), param.getResponse());
+		} else {
+			createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
+		}
+	}
+
+	private Cookie addCookie(String bearerToken) {
+		Cookie cookie =	new Cookie(AEHClientConstants.BEARER_TOKEN, bearerToken);
+		cookie.setMaxAge((int) AEHClientDateUtil.addDays(System.currentTimeMillis(), 365));
+		return cookie ;
 	}
 
 	private void createRedirectResponse(AEHClientParam param, Header header) throws IOException, AEHClientException {
@@ -105,26 +117,13 @@ public class AcessRequestHandler extends RequestHandlerBase {
 		getRequest.addHeader(AEHClientConstants.CLIENT_SECRET_HEADER, param.getClientSecret());
 		getRequest.addHeader(AEHClientConstants.CLIENT_NAME_HEADER, getManager().getMasterConfig().getClientSecret());
 		String accessToken = getBearerToken(request);
-		if (null == accessToken) {
+		if (null == accessToken || "".equals(accessToken) || "null".equals(accessToken)) {
 			accessToken = request.getHeader(AEHClientConstants.BEARER_TOKEN);
 		}
 		getRequest.addHeader(AEHClientConstants.BEARER_TOKEN, accessToken);
 		getRequest.addHeader(AEHClientConstants.REQUEST_SCOPE, request.getContextPath() + request.getServletPath());
 		getRequest.addHeader(AEHClientConstants.REQUEST_SCOPE_TYPE, request.getMethod());
 		return getRequest;
-	}
-
-	private String getBearerToken(HttpServletRequest request) {
-		Cookie[] cookies = request.getCookies();
-		if (null == cookies || cookies.length == 0) {
-			return null;
-		}
-		for (int i = 0; i < cookies.length; i++) {
-			if (AEHClientConstants.BEARER_TOKEN.equals(cookies[i].getName())) {
-				return cookies[i].getValue();
-			}
-		}
-		return null;
 	}
 
 	private String buildMasterUrl() {

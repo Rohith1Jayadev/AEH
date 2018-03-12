@@ -36,13 +36,10 @@ public class TokenKeyValidator extends ClientSecretValidator {
 		}
 		BearerToken tokenValue = TokenUtil.getTokenValue(accessheader);
 		if (TokenUtil.hasExpired(tokenValue)) {
-			
 			boolean refreshTokenValidation = validateRefreshToken();
-			
 			if(!refreshTokenValidation){
 				return false;
 			}
-	
 			return true;
 		}
 		if (TokenUtil.isClientValidated(tokenValue, clientSecret)) {

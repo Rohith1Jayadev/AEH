@@ -30,59 +30,52 @@ import com.rohith.app.authclient.manager.AEHClientManager;
 public class AuthenticationRequestHandler extends RequestHandlerBase {
 
 	private RequestHandlerBase next;
-
 	public AuthenticationRequestHandler(RequestType requestType, AEHClientManager manager) {
 		super(requestType, manager);
-
 		this.next = new AutherizationRequestHandler(RequestType.AUTHERIZE, manager);
 	}
-
 	@Override
 	public void handleRequest(AEHClientParam param) throws AEHClientException {
-
 		if (!checkResponsibility(param.getRequestType())) {
 			this.next.handleRequest(param);
 		} else {
-			
-			
-			CloseableHttpResponse response = null;
-
-			try {
-				HttpPost postRequest = createRequest(param);
-				response = sendPostRequest(postRequest);
-				Header firstHeader = response.getFirstHeader(AEHClientConstants.SERVER_ACCESS_AUTH_RESPONSE);
-				if (firstHeader.getValue().equals("true")) {
-					Header authGrant = response.getFirstHeader(AEHClientConstants.AUTH_GRANT_HEADER);
-					if (null == authGrant || "".equals(authGrant.getValue())) {
-						sendErrorResponse(param, "Server didnt respond");
-					} else {
-						HttpServletResponse httpServletResponse = param.getResponse();
-						httpServletResponse.setHeader(AEHClientConstants.AUTH_GRANT_HEADER, authGrant.getValue());
-						param.setRequestType(RequestType.AUTHERIZE);
-						next.handleRequest(param);
-					}
+			authenticateClient(param);
+		}
+	}
+	private void authenticateClient(AEHClientParam param) throws AEHClientException {
+		CloseableHttpResponse response = null;
+		try {
+			HttpPost postRequest = createRequest(param);
+			response = sendPostRequest(postRequest);
+			Header firstHeader = response.getFirstHeader(AEHClientConstants.SERVER_ACCESS_AUTH_RESPONSE);
+			if (firstHeader.getValue().equals("true")) {
+				Header authGrant = response.getFirstHeader(AEHClientConstants.AUTH_GRANT_HEADER);
+				if (null == authGrant || "".equals(authGrant.getValue())) {
+					sendErrorResponse(param, "Server didnt respond", 503);
 				} else {
-					sendErrorResponse(param, "Not Sucessfully Authenticated");
+					HttpServletResponse httpServletResponse = param.getResponse();
+					httpServletResponse.setHeader(AEHClientConstants.AUTH_GRANT_HEADER, authGrant.getValue());
+					param.setRequestType(RequestType.AUTHERIZE);
+					next.handleRequest(param);
 				}
-			} catch (ClientProtocolException e) {
-				throw new AEHClientException("A client protocol exception occured while communicating with host", e);
+			} else {
+				sendErrorResponse(param, "Not Sucessfully Authenticated", 401);
+			}
+		} catch (ClientProtocolException e) {
+			throw new AEHClientException("A client protocol exception occured while communicating with host", e);
+		} catch (IOException e) {
+			throw new AEHClientException("An IO Exception  occured while communicating with host", e);
+		} finally {
+			try {
+				if (null != response) {
+					response.close();
+				}
 			} catch (IOException e) {
-				throw new AEHClientException("An IO Exception  occured while communicating with host", e);
-			} finally {
-				try {
-					if (null != response) {
-						response.close();
-					}
-				} catch (IOException e) {
-					throw new AEHClientException("An IO Exception  occured while closing the response from server", e);
-				}
+				throw new AEHClientException("An IO Exception  occured while closing the response from server", e);
 			}
 		}
-
 	}
-
 	private HttpPost createRequest(AEHClientParam param) throws UnsupportedEncodingException {
-
 		AEHMasterConfig config = getManager().getMasterConfig();
 		HttpServletRequest request = param.getRequest();
 		HttpPost post = new HttpPost(buildMasterUrl(param.getRequest(), config));
@@ -93,14 +86,13 @@ public class AuthenticationRequestHandler extends RequestHandlerBase {
 		params.add(new BasicNameValuePair(AEHClientConstants.CLIENT_SECURE_PASSWORD_PARAM,
 				request.getParameter("password")));
 		post.setEntity(new UrlEncodedFormEntity(params, HTTP.DEF_CONTENT_CHARSET));
-
 		return post;
 	}
 
 	private String buildMasterUrl(HttpServletRequest httpServletRequest, AEHMasterConfig config) {
 
-		StringBuilder builder = new StringBuilder("http://").append(config.getMasterHost()).append(":")
-				.append(config.getMasterPort()).append(config.getMasterAuthenticationUrl());
+		StringBuilder builder = new StringBuilder(AEHClientConstants.DEFAULT_SCHEME).append(config.getMasterHost())
+				.append(":").append(config.getMasterPort()).append(config.getMasterAuthenticationUrl());
 		return builder.toString();
 	}
 

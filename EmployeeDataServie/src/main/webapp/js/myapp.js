@@ -1,7 +1,6 @@
 $(document)
 		.ready(
 				function() {
-
 					/**
 					 * Comment Function calls the access servlet on user click
 					 */
@@ -21,7 +20,8 @@ $(document)
 															dataType : 'html',
 															beforeSend : function(
 																	xhr) {
-															console.log(cookie);
+																console
+																		.log(cookie);
 																xhr
 																		.setRequestHeader(
 																				'x-request-type',
@@ -43,7 +43,6 @@ $(document)
 
 																}
 															},
-
 															error : function(
 																	data) {
 																if (xhr
@@ -51,29 +50,39 @@ $(document)
 																	console
 																			.log(xhr
 																					.getResponseHeader("uri"));
-
 																}
-
 															}
 														})
 												.done(
 														function(data) {
-
 															$(
 																	'#ajaxGetUserServletResponse')
 																	.html(data);
 														});
+
+										
 									});
 
 					/**
-					 * Comment Function calls the Logout servlet  on user click
+					 * Comment Function calls the LogOut servlet  on user click
 					 */
-					//        $('#userName').blur(function(event) {
-					//            var name = $('#userName').val();
-					//            $.get('firstpage', {
-					//                    userName : name
-					//            }, function(responseText) {
-					//                    $('#ajaxGetUserServletResponse').text(responseText);
-					//            });
-					//    });
+					$('#logout').click(
+							function(event) {
+								var cookie = $('#cookie').val();
+								var logout = $.ajax({
+									type : 'GET',
+									url : "./OAuth/logout",
+
+									beforeSend : function(logout) {
+										logout.setRequestHeader(
+												'x-request-type', 'LOGOUT');
+										logout.setRequestHeader(
+												'x-bearer-token', cookie);
+									},
+									error : function(data) {
+										$('#ajaxGetUserServletResponse').html(
+												data.responseText);
+									},
+								})
+							});
 				});

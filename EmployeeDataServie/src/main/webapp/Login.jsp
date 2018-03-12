@@ -21,6 +21,8 @@
 			<span style="display: inline-block; width: 10;"></span> <input
 				type="button" id="access" value="Access" /> <span
 				style="display: inline-block; width: 10;"></span>
+				<input
+				type="button" id="logout" value="LogOut" /> 
 	</form>
 	<br>
 	<br>

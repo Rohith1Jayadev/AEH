@@ -23,7 +23,7 @@ public class AutherizationRequestHandler extends RequestHandlerBase {
 
 	public AutherizationRequestHandler(RequestType requestType, AEHClientManager manager) {
 		super(requestType, manager);
-		this.next = new InvalidRequestHandler(RequestType.INVALID, manager);
+		this.next = new LogoutRequestHandler(RequestType.LOGOUT, manager);
 	}
 
 	@Override
@@ -32,13 +32,15 @@ public class AutherizationRequestHandler extends RequestHandlerBase {
 		System.out.println("Autherrize Request Recieved");
 		if (!checkResponsibility(param.getRequestType())) {
 			this.next.handleRequest(param);
-		}
-		try {
-			autherizeClient(param);
-		} catch (IOException e) {
+		}else{
+			try {
+				autherizeClient(param);
+			} catch (IOException e) {
 
-			throw new AEHClientException("Error occured while handling the autherize request", e);
+				throw new AEHClientException("Error occured while handling the autherize request", e);
+			}
 		}
+		
 	}
 
 	private void autherizeClient(AEHClientParam param) throws IOException {
@@ -61,19 +63,11 @@ public class AutherizationRequestHandler extends RequestHandlerBase {
 	private void sendResponseAddCookie(AEHClientParam param, CloseableHttpResponse response) throws IOException {
 		HttpServletRequest request = param.getRequest();
 		HttpServletResponse httpServletResponse = param.getResponse();
-		String accessPageUrl = request.getParameter("passUrl");
-
 		String accessToken = response.getFirstHeader(AEHClientConstants.ACCESS_TOKEN_HEADER).getValue();
 		httpServletResponse.addHeader(AEHClientConstants.ACCESS_TOKEN_HEADER, accessToken);
 
-		// ttpServletResponse.addCookie(createCookie(accessToken));
-
 	}
 
-	private Cookie createCookie(String accessToken) {
-		Cookie c = new Cookie(AEHClientConstants.BEARER_TOKEN, accessToken);
-		return c;
-	}
 
 	private HttpGet createRequest(AEHClientParam param) throws IOException {
 
@@ -83,7 +77,7 @@ public class AutherizationRequestHandler extends RequestHandlerBase {
 		String authGrant = param.getResponse().getHeader(AEHClientConstants.AUTH_GRANT_HEADER);
 		if (null == authGrant) {
 			sendErrorResponse(param,
-					"Auth Grant Not received from the server, hence redirecting response back to user");
+					"Auth Grant Not received from the server, hence redirecting response back to user",409);
 		}
 		getRequest.addHeader(AEHClientConstants.AUTH_GRANT_HEADER, authGrant);
 		return getRequest;
