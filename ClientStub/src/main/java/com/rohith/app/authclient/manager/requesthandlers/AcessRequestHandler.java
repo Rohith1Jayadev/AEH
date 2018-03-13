@@ -73,6 +73,9 @@ public class AcessRequestHandler extends RequestHandlerBase {
 			param.getResponse().addCookie(addCookie(bearerToken));
 			param.getChain().doFilter(param.getRequest(), param.getResponse());
 		} else {
+			
+			//Need to Handle The reponse codes here and map it acordingly
+			
 			createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
 		}
 	}
