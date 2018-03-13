@@ -65,17 +65,12 @@ public class SimpleFileAuthenticator extends RequestAuthenticator {
 		String userEmail = request.getParameter(AEHubConstants.CLIENT_USER_NAME_PARAM);
 
 		String passcode = request.getParameter(AEHubConstants.CLIENT_SECURE_PASSWORD_PARAM);
-		
-
-		
-
+	
 		if (null == this.authinfo.get(userEmail) || !passcode.equals(this.authinfo.get(userEmail))) {
-			
 			populateErrorResponse(callBack);
 			divert(callBack, false);
 		
 		} else {
-
 			populateSuccessAuthParam(callBack);
 			divert(callBack, true);
 		}
@@ -84,7 +79,7 @@ public class SimpleFileAuthenticator extends RequestAuthenticator {
 
 	private void populateErrorResponse(AEHAuthCallBack callBack) {
 		AuthenticationResponse response = new AuthenticationResponse();
-		response.setResponseCode(400);
+		response.setResponseCode(401);
 		response.setResponse(ResponseType.ERROR);
 		response.setErrorReason("Invalid User ID or Password.. User Not Found");
 		((AuthenticationParam)callBack.getParam()).setAuthResponse(response);
