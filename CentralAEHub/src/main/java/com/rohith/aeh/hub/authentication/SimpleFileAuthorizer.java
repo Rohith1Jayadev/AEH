@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.rohith.aeh.crypto.AEHCipher;
 import com.rohith.aeh.crypto.exception.AEHCipherException;
-import com.rohith.aeh.hub.authentication.dataobjects.AuthenticationParam;
-import com.rohith.aeh.hub.authentication.dataobjects.AuthenticationResponse;
 import com.rohith.aeh.hub.authentication.dataobjects.AutherizationParam;
 import com.rohith.aeh.hub.authentication.dataobjects.AutherizationResponse;
 import com.rohith.aeh.hub.authentication.dataobjects.ResponseType;
@@ -130,19 +128,13 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 		UserProfile profile = this.profileInfo.get(token.getAuthorizer());
 
 		BearerToken bearerToken = new BearerToken();
-
 		bearerToken.setExpiryDate(AEHHubDateUtil.addHours(System.currentTimeMillis(), 2));
-
 		bearerToken.setUserProfile(profile);
-
 		bearerToken.setClientSecret(request.getHeader(AEHubConstants.CLIENT_SECRET_HEADER));
-
 		AutherizationResponse response = new AutherizationResponse();
-
 		response.setBearerToken(bearerToken);
 		response.setResponseCode(200);
 		response.setResponse(ResponseType.SUCCESS);
-
 		((AutherizationParam) callback.getParam()).setAutherizationResponse(response);
 	}
 

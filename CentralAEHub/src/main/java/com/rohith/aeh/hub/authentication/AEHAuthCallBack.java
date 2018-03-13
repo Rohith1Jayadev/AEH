@@ -6,10 +6,7 @@ public interface AEHAuthCallBack {
 		
 	public void onSuccess();
 	
-	
 	public void onFailure();
 	
-	
 	public AEHAuthParamBase getParam();
-
 }

@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.rohith.aeh.hub.exception.AEHHubException;
 import com.rohith.aeh.hub.servlets.constants.AEHubConstants;
+import com.rohith.aeh.hub.servlets.constants.AccessGrantErrorCodes;
 import com.rohith.aeh.hub.util.token.BearerToken;
 import com.rohith.aeh.hub.util.token.TokenUtil;
 
@@ -32,12 +33,14 @@ public class TokenKeyValidator extends ClientSecretValidator {
 		String accessheader = request.getHeader(AEHubConstants.ACCESS_TOKEN_HEADER);
 		String clientSecret = request.getHeader(AEHubConstants.CLIENT_SECRET_HEADER);
 		if (null == accessheader || "null".equals(accessheader)) {
+			request.setAttribute(AEHubConstants.ERROR_MAPPING, AccessGrantErrorCodes.INVALID_TOKEN_KEY);
 			return false;
 		}
 		BearerToken tokenValue = TokenUtil.getTokenValue(accessheader);
 		if (TokenUtil.hasExpired(tokenValue)) {
 			boolean refreshTokenValidation = validateRefreshToken();
 			if(!refreshTokenValidation){
+				request.setAttribute(AEHubConstants.ERROR_MAPPING, AccessGrantErrorCodes.EXPIRED_TOKEN_KEY);
 				return false;
 			}
 			return true;
@@ -45,6 +48,7 @@ public class TokenKeyValidator extends ClientSecretValidator {
 		if (TokenUtil.isClientValidated(tokenValue, clientSecret)) {
 			return true;
 		}
+		request.setAttribute(AEHubConstants.ERROR_MAPPING, AccessGrantErrorCodes.INVALID_TOKEN_KEY);
 		return false;
 	}
 	private boolean validateRefreshToken() {

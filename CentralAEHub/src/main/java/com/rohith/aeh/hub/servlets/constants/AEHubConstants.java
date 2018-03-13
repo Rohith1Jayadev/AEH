@@ -13,7 +13,9 @@ public class AEHubConstants {
 	 * 
 	 * Headers
 	 */
-
+	
+	public static final String ERROR_MAPPING = "x-error-mapping";
+	
 	public static final String CLIENT_NAME_HEADER = "x-client-name";
 	
 	public static final String CLIENT_SECRET_HEADER = "x-client-secret";
