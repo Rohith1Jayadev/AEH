@@ -65,7 +65,7 @@ public class AcessRequestHandler extends RequestHandlerBase {
 
 	private void takeDecision(AEHClientParam param, CloseableHttpResponse response, HttpGet getRequest,
 			Header firstHeader) throws IOException, ServletException, AEHClientException {
-			if (null != firstHeader && firstHeader.getValue().equals("true")) {
+		if (null != firstHeader && firstHeader.getValue().equals("true")) {
 			String bearerToken = getBearerToken(param.getRequest());
 			if (null == bearerToken || "".equals(bearerToken) || "null".equals(bearerToken)) {
 				bearerToken = getRequest.getFirstHeader(AEHClientConstants.BEARER_TOKEN).getValue();
@@ -78,9 +78,10 @@ public class AcessRequestHandler extends RequestHandlerBase {
 	}
 
 	private Cookie addCookie(String bearerToken) {
-		Cookie cookie =	new Cookie(AEHClientConstants.BEARER_TOKEN, bearerToken);
-		cookie.setMaxAge((int) AEHClientDateUtil.addDays(System.currentTimeMillis(), 365));
-		return cookie ;
+		Cookie cookie = new Cookie(AEHClientConstants.BEARER_TOKEN, bearerToken);
+		cookie.setMaxAge((int) AEHClientDateUtil.addDays(System.currentTimeMillis(), 30));
+		System.out.println("Cookie Path" + cookie.getPath());
+		return cookie;
 	}
 
 	private void createRedirectResponse(AEHClientParam param, Header header) throws IOException, AEHClientException {
@@ -128,7 +129,7 @@ public class AcessRequestHandler extends RequestHandlerBase {
 
 	private String buildMasterUrl() {
 		AEHMasterConfig config = getManager().getMasterConfig();
-		StringBuilder url = new StringBuilder("http://");
+		StringBuilder url = new StringBuilder(AEHClientConstants.DEFAULT_SCHEME);
 		url.append(config.getMasterHost()).append(":").append(config.getMasterPort()).append(config.getMasterUrl());
 		return url.toString();
 	}
