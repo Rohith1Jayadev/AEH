@@ -1,4 +1,4 @@
-package com.rohith.aeh.crypto.exceptin;
+package com.rohith.aeh.crypto.exception;
 
 public class AEHCipherException extends Exception {
 
