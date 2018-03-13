@@ -4,4 +4,5 @@
 <transformationMode>CBC</transformationMode>
 <paddingScheme>PKCS5Padding</paddingScheme>
 <keySize>256</keySize>
+<encryptionClass>com.rohith.aeh.crypto.impls.javacipher.AESJavaCipherImpl</encryptionClass>
 </hubEncryptionConfig>

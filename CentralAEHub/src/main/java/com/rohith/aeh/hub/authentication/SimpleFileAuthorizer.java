@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.rohith.aeh.crypto.AEHCipher;
+import com.rohith.aeh.crypto.exception.AEHCipherException;
 import com.rohith.aeh.hub.authentication.dataobjects.AuthenticationParam;
 import com.rohith.aeh.hub.authentication.dataobjects.AuthenticationResponse;
 import com.rohith.aeh.hub.authentication.dataobjects.AutherizationParam;
@@ -17,6 +19,7 @@ import com.rohith.aeh.hub.authentication.dataobjects.AutherizationResponse;
 import com.rohith.aeh.hub.authentication.dataobjects.ResponseType;
 import com.rohith.aeh.hub.authentication.dataobjects.UserProfile;
 import com.rohith.aeh.hub.exception.AEHHubException;
+import com.rohith.aeh.hub.manager.AEHHubManager;
 import com.rohith.aeh.hub.servlets.constants.AEHubConstants;
 import com.rohith.aeh.hub.util.authgrant.AuthGrantToken;
 import com.rohith.aeh.hub.util.date.AEHHubDateUtil;
@@ -102,7 +105,9 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 
 		String authGrant = request.getHeader(AEHubConstants.AUTH_GRANT_HEADER);
 		try {
-			AuthGrantToken token = AuthGrantToken.fromTokenString(authGrant);
+			
+			String decipher = decipher(authGrant);
+			AuthGrantToken token = AuthGrantToken.fromTokenString(decipher);
 
 			if (null == token.getAuthorizer() || null == this.profileInfo.get(token.getAuthorizer())) {
 				populateErrorResponse(callback, "User Profile Not Found");
@@ -147,5 +152,14 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 		response.setResponse(ResponseType.ERROR);
 		response.setErrorReason(message);
 		((AutherizationParam) callback.getParam()).setAutherizationResponse(response);
+	}
+	
+	private String decipher(String authGrant) throws AEHHubException  {
+		AEHCipher ciper = AEHHubManager.getManager().getEncrytionManager().getCipher();
+		try {
+			return ciper.decipher(authGrant);
+		} catch (AEHCipherException e) {
+			throw new AEHHubException(e);
+		}
 	}
 }

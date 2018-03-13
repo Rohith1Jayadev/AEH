@@ -2,15 +2,13 @@ package com.rohith.aeh.hub.manager;
 
 import javax.xml.bind.JAXBException;
 
-import com.rohith.aeh.hub.encryption.AEHHubEncryptionImpl;
 import com.rohith.aeh.hub.encryption.EncryptionConfigurationReader;
 import com.rohith.aeh.hub.encryption.EncryptionHubManager;
 import com.rohith.aeh.hub.encryption.HubEncryptionConfig;
 
 public class AEHHubManager {
 
-	private EncryptionHubManager encryptionManager;
-
+	
 	private static final AEHHubManager manager = new AEHHubManager();
 
 	private HubEncryptionConfig encryptionConfig;
@@ -41,7 +39,7 @@ public class AEHHubManager {
 	}
 
 	private void initializeEncryptionManager() {
-		this.encryptionHubManager = new AEHHubEncryptionImpl(this);
+		this.encryptionHubManager = new EncryptionHubManager(this);
 	}
 
 	private void readEncryptionConfig() {

@@ -14,6 +14,8 @@ public class HubEncryptionConfig {
 	
 	private int keySize;
 	
+	private String encryptionClass;
+	
 	public HubEncryptionConfig(){
 		
 	}
@@ -52,6 +54,15 @@ public class HubEncryptionConfig {
 	@XmlElement
 	public void setKeySize(int keySize) {
 		this.keySize = keySize;
+	}
+
+	public String getEncryptionClass() {
+		return encryptionClass;
+	}
+
+	@XmlElement
+	public void setEncryptionClass(String encryptionClass) {
+		this.encryptionClass = encryptionClass;
 	}
 
 
