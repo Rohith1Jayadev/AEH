@@ -63,6 +63,11 @@ public class Scope {
 				return true;
 			}
 			if (thisValues[i].equals(otherValues[i])||otherValues[i].equals(" ")) {
+				
+				if(i==(minLength-1)){
+					
+					return true;
+				}
 				continue;
 			} else {
 				return false;

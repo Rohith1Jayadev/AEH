@@ -45,7 +45,6 @@ public class AEHubConstants {
 	 * ERROR Codes
 	 * 
 	 */
-	
 	public static final String CLIENT_NAME_NOT_VALID_ERROR = "Invalid Client Name";
 
 	public static final String CLIENT_SECRET_NOT_GENERATED = "Could not register client";
