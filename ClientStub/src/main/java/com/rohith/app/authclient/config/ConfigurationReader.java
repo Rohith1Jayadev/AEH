@@ -1,7 +1,6 @@
 package com.rohith.app.authclient.config;
 
 import java.io.File;
-import java.net.URL;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -74,7 +73,6 @@ public class ConfigurationReader {
 	}
 
 	public static String resolvePath() {
-
 		ClassLoader classLoader = ConfigurationReader.class.getClassLoader();
 		File file = new File(classLoader.getResource(CONFIG).getFile());
 		System.out.println(file.getAbsolutePath());

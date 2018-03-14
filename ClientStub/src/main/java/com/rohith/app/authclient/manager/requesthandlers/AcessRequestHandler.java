@@ -3,12 +3,10 @@ package com.rohith.app.authclient.manager.requesthandlers;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.Header;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
@@ -16,9 +14,10 @@ import com.rohith.app.authclient.api.AEHClientParam;
 import com.rohith.app.authclient.api.RequestType;
 import com.rohith.app.authclient.config.AEHMasterConfig;
 import com.rohith.app.authclient.constants.AEHClientConstants;
+import com.rohith.app.authclient.constants.ServerErrorCodes;
 import com.rohith.app.authclient.exception.AEHClientException;
 import com.rohith.app.authclient.manager.AEHClientManager;
-import com.rohith.app.authclient.util.AEHClientDateUtil;
+import com.rohith.app.authclient.util.ValidationUtil;
 
 public class AcessRequestHandler extends RequestHandlerBase {
 
@@ -38,58 +37,136 @@ public class AcessRequestHandler extends RequestHandlerBase {
 		}
 	}
 
+	/**
+	 * Method Handles the ACCESS type request coming in for any client
+	 * 
+	 * @param param
+	 * @throws AEHClientException
+	 */
 	private void handleAccessRequestParam(AEHClientParam param) throws AEHClientException {
 
 		CloseableHttpResponse response = null;
 		try {
 			HttpGet getRequest = createRequest(param);
 			response = sendGetRequest(getRequest);
-			Header firstHeader = response.getFirstHeader(AEHClientConstants.SERVER_ACCESS_AUTH_RESPONSE);
-			takeDecision(param, response, getRequest, firstHeader);
-		} catch (ClientProtocolException e) {
-			throw new AEHClientException("A client protocol exception occured while communicating with host", e);
-		} catch (IOException e) {
-			throw new AEHClientException("An IO Exception  occured while communicating with host", e);
-		} catch (ServletException e) {
-			throw new AEHClientException("Can't pass the request forward to the filter chain", e);
+			handleResponse(param, response, getRequest);
+		} catch (Exception e) {
+			throw new AEHClientException("An exception occured while communicating with host", e);
 		} finally {
 			try {
-				if (null != response) {
-					response.close();
-				}
+				closeResponse(response);
 			} catch (IOException e) {
-				throw new AEHClientException("An IO Exception  occured while closing the response from server", e);
+				throw new AEHClientException("Exception Occured while closing the response", e);
 			}
 		}
 	}
 
-	private void takeDecision(AEHClientParam param, CloseableHttpResponse response, HttpGet getRequest,
-			Header firstHeader) throws IOException, ServletException, AEHClientException {
+	/**
+	 * 
+	 * Method handles the response sent from the AEH HUB Server
+	 * <p>
+	 * Splits the response in to two channels SUCCESS and ERROR based on a
+	 * <b><ul>SERVER AUTH RESPONSE HEADER</ul></b>
+	 * 
+	 * This header is mandatory from the Server Side as a decision is made based
+	 * on it.
+	 * </p>
+	 * 
+	 * @param param
+	 * @param response
+	 * @param getRequest
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws AEHClientException
+	 */
+	private void handleResponse(AEHClientParam param, CloseableHttpResponse response, HttpGet getRequest)
+			throws IOException, ServletException, AEHClientException {
+		Header firstHeader = response.getFirstHeader(AEHClientConstants.SERVER_ACCESS_AUTH_RESPONSE);
 		if (null != firstHeader && firstHeader.getValue().equals("true")) {
-			String bearerToken = getBearerToken(param.getRequest());
-			if (null == bearerToken || "".equals(bearerToken) || "null".equals(bearerToken)) {
-				bearerToken = getRequest.getFirstHeader(AEHClientConstants.BEARER_TOKEN).getValue();
-			}
-			param.getResponse().addCookie(addCookie(bearerToken));
-			param.getChain().doFilter(param.getRequest(), param.getResponse());
+			onSuccessAccessGrant(param, getRequest);
 		} else {
-			
-			//Need to Handle The reponse codes here and map it acordingly
-			
-			createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
+			onFailedAccessGrant(param, response, getRequest);
 		}
 	}
 
-	private Cookie addCookie(String bearerToken) {
-		Cookie cookie = new Cookie(AEHClientConstants.BEARER_TOKEN, bearerToken);
-		cookie.setMaxAge((int) AEHClientDateUtil.addDays(System.currentTimeMillis(), 30));
-		System.out.println("Cookie Path" + cookie.getPath());
-		return cookie;
+	/**
+	 * Method handles the Failed Access Response 
+	 * 
+	 * <p> This method handles the failed response as in the responses that couldn't be validated 
+	 * 
+	 * properly by the AEHHub Server</p> 
+	 * 
+	 * <p> This could be due to different reason such as an invalid Bearer Token or Invalid Scope or Invalid Client Secret </p> 
+	 * 
+	 * 
+	 * @param param
+	 * @param response
+	 * @param getRequest
+	 * @throws IOException
+	 * @throws AEHClientException
+	 */
+	private void onFailedAccessGrant(AEHClientParam param, CloseableHttpResponse response, HttpGet getRequest)
+			throws IOException, AEHClientException {
+
+		Header firstHeader = response.getFirstHeader(AEHClientConstants.ERROR_CODE_MAPPING);
+
+		System.out.println(firstHeader);
+		
+		if (ValidationUtil.isHeaderNull(firstHeader)) {
+
+			createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
+
+		} else {
+
+			try {
+			
+				int errorCode = Integer.parseInt(firstHeader.getValue());
+			
+				switch(errorCode){
+				case ServerErrorCodes.EXPIRED_TOKEN_KEY:
+				case ServerErrorCodes.NULL_TOKEN_KEY:
+				case ServerErrorCodes.INVALID_TOKEN_KEY:
+					createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
+					break;
+				case ServerErrorCodes.SCOPE_NOT_GRANTED:
+				case ServerErrorCodes.INVALID_SCOPE:
+						sendErrorResponse(param, "Contained is Restricted for User", 403); 
+					break;
+				case ServerErrorCodes.INVALID_CLIENT_SECRET:
+					break;
+				}
+
+			} catch (NumberFormatException e) {
+
+				createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Method helps in adding cookie back to the
+	 * 
+	 * @param param
+	 * @param getRequest
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	private void onSuccessAccessGrant(AEHClientParam param, HttpGet getRequest) throws IOException, ServletException {
+	
+		String bearerToken = getBearerToken(param.getRequest());
+		if (!ValidationUtil.isValid(bearerToken)) {
+			bearerToken = getRequest.getFirstHeader(AEHClientConstants.BEARER_TOKEN).getValue();
+			param.getResponse().addCookie(addCookie(AEHClientConstants.BEARER_TOKEN, bearerToken, 30));
+		}
+		param.getChain().doFilter(param.getRequest(), param.getResponse());
 	}
 
 	private void createRedirectResponse(AEHClientParam param, Header header) throws IOException, AEHClientException {
-
 		if (null == header) {
+
 			throw new AEHClientException("REDIRECT URL not recieved from Server");
 		}
 		String redirectURL = header.getValue();

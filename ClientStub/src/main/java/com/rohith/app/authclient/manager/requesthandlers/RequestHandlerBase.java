@@ -19,6 +19,7 @@ import com.rohith.app.authclient.constants.AEHClientConstants;
 import com.rohith.app.authclient.exception.AEHClientException;
 import com.rohith.app.authclient.manager.AEHClientManager;
 import com.rohith.app.authclient.manager.connection.ConnectionManager;
+import com.rohith.app.authclient.util.AEHClientDateUtil;
 
 /**
  * 
@@ -103,6 +104,7 @@ public abstract class RequestHandlerBase {
 	}
 
 	protected String getBearerToken(HttpServletRequest request) {
+
 		Cookie[] cookies = request.getCookies();
 		if (null == cookies || cookies.length == 0) {
 			return null;
@@ -116,7 +118,6 @@ public abstract class RequestHandlerBase {
 	}
 
 	protected Cookie getCookie(HttpServletRequest request, String cookieName) {
-		
 		Cookie[] cookies = request.getCookies();
 		if (null == cookies || cookies.length == 0) {
 			return null;
@@ -128,6 +129,18 @@ public abstract class RequestHandlerBase {
 			}
 		}
 		return null;
+	}
+
+	protected Cookie addCookie(String name, String value, int maxAge) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setMaxAge(AEHClientDateUtil.addDays(maxAge));
+		return cookie;
+	}
+
+	protected void closeResponse(CloseableHttpResponse response) throws IOException {
+		ConnectionManager connectionManager = getManager().getConnectionManager();
+		connectionManager.closeResponse(response);
 
 	}
+
 }

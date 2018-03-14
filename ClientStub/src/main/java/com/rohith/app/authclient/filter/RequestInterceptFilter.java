@@ -54,6 +54,7 @@ public class RequestInterceptFilter implements Filter {
 	}
 
 	private void checkWhetherRegistered() throws ClientProtocolException, IOException, AEHClientException {
+		
 		if (!isRegistered.get()) {
 
 			synchronized (this) {
@@ -82,7 +83,8 @@ public class RequestInterceptFilter implements Filter {
 	}
 
 	public void init(FilterConfig config) throws ServletException {
-		try {
+	
+	try {
 			clientManager = AEHClientManager.getManager();
 			this.isRegistered = new AtomicBoolean(false);
 		} catch (Exception e) {

@@ -2,10 +2,8 @@ package com.rohith.app.authclient.constants;
 
 public class AEHClientConstants {
 
-	
-	public static final String DEFAULT_SCHEME="http://";
-	
-	
+	public static final String DEFAULT_SCHEME = "http://";
+
 	/**
 	 * Status
 	 */
@@ -17,12 +15,11 @@ public class AEHClientConstants {
 	 * Header
 	 * 
 	 */
-
 	public static final String BEARER_TOKEN = "x-bearer-token";
 
 	public static final String REQUEST_SCOPE = "x-request-scope";
-	
-	public static final String REQUEST_SCOPE_TYPE ="x-request-scope-type";
+
+	public static final String REQUEST_SCOPE_TYPE = "x-request-scope-type";
 
 	public static final String CLIENT_NAME_HEADER = "x-client-name";
 
@@ -47,6 +44,8 @@ public class AEHClientConstants {
 	public static final String CLIENT_USER_NAME_PARAM = "x-client-authid";
 
 	public static final String CLIENT_SECURE_PASSWORD_PARAM = "x-client-pass";
-	
+
 	public static final String ACCESS_TOKEN_HEADER = "x-bearer-token";
+
+	public static final String ERROR_CODE_MAPPING = "x-error-mapping";
 }
