@@ -62,6 +62,68 @@ $(document)
 
 										
 									});
+					/**
+					 * For Accessing the second resource
+					 * 
+					 */
+					$('#access2')
+					.click(
+							function(event) {
+								
+								console.log("Accessing Second");
+								var name = $('#userName').val();
+								var cookie = $('#cookie').val();
+								var xhr = $
+										.ajax(
+												{
+													type : "GET",
+													url : "./OAuth/resourcetwo",
+													data : {
+														userName : name
+													},
+													dataType : 'html',
+													beforeSend : function(
+															xhr) {
+														console
+																.log(cookie);
+														xhr
+																.setRequestHeader(
+																		'x-request-type',
+																		'ACCESS');
+														xhr
+																.setRequestHeader(
+																		'x-bearer-token',
+																		cookie);
+													},
+													success : function(
+															data) {
+														if (xhr
+																.getResponseHeader("x-clredirect-status")) {
+															console
+																	.log(xhr
+																			.getResponseHeader("x-clredirect-url"));
+															window.location = xhr
+																	.getResponseHeader("x-clredirect-url");
+
+														}
+													},
+													error : function(
+															data) {
+														$('#ajaxGetUserServletResponse').html(
+																data.responseText);
+													}
+													
+												})
+										.done(
+												function(data) {
+													$(
+															'#ajaxGetUserServletResponse')
+															.html(data);
+												});
+
+								
+							});
+					
 
 					/**
 					 * Comment Function calls the LogOut servlet  on user click

@@ -19,7 +19,11 @@
 			<input type="hidden" id="cookie" value =<%=request.getParameter("cookie")%> />
 			<p>
 			<span style="display: inline-block; width: 10;"></span> <input
-				type="button" id="access" value="Access" /> <span
+				type="button" id="access" value="Access First Resource" /> <span
+				style="display: inline-block; width: 10;"></span>
+				<input
+				type="button" id="access2" value="Access Second Resource" />
+				<span
 				style="display: inline-block; width: 10;"></span>
 				<input
 				type="button" id="logout" value="LogOut" /> 
