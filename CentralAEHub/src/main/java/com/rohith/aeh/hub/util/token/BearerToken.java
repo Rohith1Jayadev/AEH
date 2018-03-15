@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import com.rohith.aeh.hub.authentication.dataobjects.UserProfile;
 import com.rohith.aeh.hub.exception.AEHHubException;
+import com.rohith.aeh.hub.servlets.constants.AccessGrantErrorCodes;
 import com.rohith.aeh.hub.util.jwt.JWTUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -18,6 +19,8 @@ public class BearerToken {
 	private String authorizingParty;
 
 	private long expiryDate;
+
+	private RefreshToken refreshToken;
 
 	private UserProfile userProfile;
 
@@ -53,15 +56,25 @@ public class BearerToken {
 		this.userProfile = userProfile;
 	}
 
+	public RefreshToken getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(RefreshToken refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
 	public static BearerToken fromTokenString(String value) throws AEHHubException {
 
 		try {
 			return JWTUtil.parseToken(value);
 
-		} catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException
-				| IllegalArgumentException | UnsupportedEncodingException e) {
-
+		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException
+				| UnsupportedEncodingException e) {
 			throw new AEHHubException("Exception while parsing token", e);
+		} catch (ExpiredJwtException e) {
+
+			throw new AEHHubException("Exception while parsing token", e, AccessGrantErrorCodes.EXPIRED_TOKEN_KEY);
 		}
 	}
 

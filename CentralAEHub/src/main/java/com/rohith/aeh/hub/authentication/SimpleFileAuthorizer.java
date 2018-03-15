@@ -22,8 +22,11 @@ import com.rohith.aeh.hub.servlets.constants.AEHubConstants;
 import com.rohith.aeh.hub.util.authgrant.AuthGrantToken;
 import com.rohith.aeh.hub.util.date.AEHHubDateUtil;
 import com.rohith.aeh.hub.util.token.BearerToken;
+import com.rohith.aeh.hub.util.token.RefreshToken;
+import com.rohith.aeh.hub.util.token.RefreshTokenUtil;
 import com.rohith.aeh.hub.util.token.Scope;
 import com.rohith.aeh.hub.util.token.ScopeType;
+import com.rohith.aeh.hub.util.token.TokenUtil;
 
 public class SimpleFileAuthorizer extends RequestAutherizer {
 
@@ -103,7 +106,7 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 
 		String authGrant = request.getHeader(AEHubConstants.AUTH_GRANT_HEADER);
 		try {
-			
+
 			String decipher = decipher(authGrant);
 			AuthGrantToken token = AuthGrantToken.fromTokenString(decipher);
 
@@ -125,17 +128,27 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 
 	private void createSuccessMessage(AEHAuthCallBack callback, HttpServletRequest request, AuthGrantToken token) {
 
-		UserProfile profile = this.profileInfo.get(token.getAuthorizer());
-
-		BearerToken bearerToken = new BearerToken();
-		bearerToken.setExpiryDate(AEHHubDateUtil.addHours(System.currentTimeMillis(), 2));
-		bearerToken.setUserProfile(profile);
-		bearerToken.setClientSecret(request.getHeader(AEHubConstants.CLIENT_SECRET_HEADER));
+		BearerToken bearerToken = createBearerToken(request, token);
 		AutherizationResponse response = new AutherizationResponse();
 		response.setBearerToken(bearerToken);
 		response.setResponseCode(200);
 		response.setResponse(ResponseType.SUCCESS);
 		((AutherizationParam) callback.getParam()).setAutherizationResponse(response);
+	}
+
+	private BearerToken createBearerToken(HttpServletRequest request, AuthGrantToken token) {
+
+		UserProfile profile = this.profileInfo.get(token.getAuthorizer());
+		BearerToken bearerToken = new BearerToken();
+		long currentTime = System.currentTimeMillis();
+		long tokenExpiry = AEHHubDateUtil.addHours(currentTime, TokenUtil.BEAER_TOKEN_EXPIRY_HOURS);
+		RefreshToken refreshToken = RefreshTokenUtil.createRefreshToken(tokenExpiry,currentTime);
+		bearerToken.setRefreshToken(refreshToken);
+		bearerToken.setExpiryDate(tokenExpiry);
+		bearerToken.setUserProfile(profile);
+		bearerToken.setClientSecret(request.getHeader(AEHubConstants.CLIENT_SECRET_HEADER));
+
+		return bearerToken;
 	}
 
 	private void populateErrorResponse(AEHAuthCallBack callback, String message) {
@@ -145,8 +158,8 @@ public class SimpleFileAuthorizer extends RequestAutherizer {
 		response.setErrorReason(message);
 		((AutherizationParam) callback.getParam()).setAutherizationResponse(response);
 	}
-	
-	private String decipher(String authGrant) throws AEHHubException  {
+
+	private String decipher(String authGrant) throws AEHHubException {
 		AEHCipher ciper = AEHHubManager.getManager().getEncrytionManager().getCipher();
 		try {
 			return ciper.decipher(authGrant);

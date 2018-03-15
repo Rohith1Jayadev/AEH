@@ -39,33 +39,24 @@ public class Scope {
 	private boolean checkType(ScopeType thisScopeType, ScopeType otherScopeType) {
 
 		if (this.scopeType == ScopeType.ALL) {
-
 			return true;
 		}
 		return (thisScopeType == otherScopeType);
 	}
 
 	private boolean checkEqual(String thisValue, String otherValue) {
-
 		String[] thisValues = thisValue.split("/");
-
 		String[] otherValues = otherValue.split("/");
-
 		int minLength = Math.min(thisValues.length, otherValues.length);
-
 		if (minLength == 0) {
-
 			return false;
 		}
-
 		for (int i = 0; i < minLength; i++) {
 			if (thisValues[i].equals("*")) {
 				return true;
 			}
 			if (thisValues[i].equals(otherValues[i])||otherValues[i].equals(" ")) {
-				
 				if(i==(minLength-1)){
-					
 					return true;
 				}
 				continue;
@@ -77,7 +68,6 @@ public class Scope {
 	}
 
 	public String toScopeString() {
-
 		return this.getScopeType().scopeType() + "#" + this.getScopeValue();
 	}
 

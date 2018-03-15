@@ -16,6 +16,8 @@ import com.rohith.aeh.hub.exception.AEHHubException;
  */
 public class TokenUtil {
 
+	public static final int BEAER_TOKEN_EXPIRY_HOURS =2;
+	
 	/**
 	 * Get Value from String
 	 * 

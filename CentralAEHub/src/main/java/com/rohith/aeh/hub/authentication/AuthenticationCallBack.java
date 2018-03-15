@@ -18,53 +18,40 @@ public class AuthenticationCallBack implements AEHAuthCallBack {
 
 	@Override
 	public void onSuccess() {
-
 		HttpServletResponse response = param.getResponse();
-
 		AuthenticationResponse authenticationResponse = this.param.getAuthResponse();
-
 		if (null == authenticationResponse) {
-
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_HEADER, "false");
 			response.setStatus(500);
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_ERROR, "Couldnt complete validation");
 		}
-
 		if (authenticationResponse.getResponse() == ResponseType.SUCCESS) {
 			response.setHeader(AEHubConstants.AUTH_GRANT_HEADER, authenticationResponse.getAuthGrant());
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_HEADER, "true");
 		}
-
 	}
 
 	@Override
 	public void onFailure() {
 
 		HttpServletResponse response = param.getResponse();
-
 		AuthenticationResponse authenticationResponse = this.param.getAuthResponse();
-
 		if (null == authenticationResponse) {
-
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_HEADER, "false");
 			response.setStatus(500);
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_ERROR, "Couldnt complete validation");
 		}
-
 		if (authenticationResponse.getResponse() == ResponseType.ERROR
 				|| authenticationResponse.getResponse() == ResponseType.UNKNOWN) {
-
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_HEADER, "false");
 			response.setStatus(authenticationResponse.getResponseCode());
 			response.setHeader(AEHubConstants.CLIENT_VALIDATION_RESPONSE_ERROR,
 					authenticationResponse.getErrorReason());
 		}
-
 	}
 
 	@Override
 	public AuthenticationParam getParam() {
-
 		return this.param;
 	}
 
