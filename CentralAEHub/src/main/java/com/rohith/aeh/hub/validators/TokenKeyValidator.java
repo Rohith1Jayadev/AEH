@@ -49,6 +49,7 @@ public class TokenKeyValidator extends ClientSecretValidator {
 			request.setAttribute(AEHubConstants.ERROR_MAPPING, AccessGrantErrorCodes.EXPIRED_TOKEN_KEY);
 			return false;
 		}
+		//TODO -> This part needs to be checked to allow the cross domain logic
 		if (TokenUtil.isClientValidated(tokenValue, clientSecret)) {
 			return true;
 		}
