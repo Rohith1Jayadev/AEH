@@ -124,6 +124,8 @@ public class AcessRequestHandler extends RequestHandlerBase {
 			
 				switch(errorCode){
 				case ServerErrorCodes.EXPIRED_TOKEN_KEY:
+					sendErrorResponse(param, "Token Key Expired", 403); 
+					break;
 				case ServerErrorCodes.NULL_TOKEN_KEY:
 				case ServerErrorCodes.INVALID_TOKEN_KEY:
 					createRedirectResponse(param, response.getFirstHeader(AEHClientConstants.SERVER_REDIRECT_URL));
