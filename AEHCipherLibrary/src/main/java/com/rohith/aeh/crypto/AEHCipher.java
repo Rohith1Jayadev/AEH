@@ -1,7 +1,7 @@
 package com.rohith.aeh.crypto;
 
 import com.rohith.aeh.crypto.config.AEHCryptoConfig;
-import com.rohith.aeh.crypto.exceptin.AEHCipherException;
+import com.rohith.aeh.crypto.exception.AEHCipherException;
 
 public interface AEHCipher {
 

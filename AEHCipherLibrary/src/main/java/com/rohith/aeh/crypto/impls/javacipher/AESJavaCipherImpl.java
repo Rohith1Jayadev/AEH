@@ -8,7 +8,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.rohith.aeh.crypto.AEHCipher;
 import com.rohith.aeh.crypto.config.AEHCryptoConfig;
-import com.rohith.aeh.crypto.exceptin.AEHCipherException;
+import com.rohith.aeh.crypto.exception.AEHCipherException;
 
 public class AESJavaCipherImpl implements AEHCipher {
 
